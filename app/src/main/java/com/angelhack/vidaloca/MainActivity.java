@@ -6,54 +6,116 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+import com.loopj.android.http.*;
+
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.*;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.util.EntityUtils;
-import com.angelhack.vidaloca.Init.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
 
 public class MainActivity extends ActionBarActivity {
 
+    class Document
+    {
+        String content;
+        int offset;
+    }
+
+
+
+    private String getJobID(String data) {
+
+        String x ="";
+        try {
+            JSONObject result = new JSONObject(data);
+            x=result.getString("jobID");
+        }
+        catch(Exception e)
+        {
+
+        }
+        return  x;
+    }
+        private ArrayList getDocumentObjects(String data) {
+
+        ArrayList<Document> documents = new ArrayList<>();
+
+        try {
+            JSONObject result = new JSONObject(data);
+
+            JSONArray jsonArray = result.getJSONArray("document");
+
+            for(int a=0;a<jsonArray.length();a++)
+            {
+
+                Document d = new Document();
+
+                d.offset = jsonArray.getJSONObject(a).getInt("offset");
+                d.content = jsonArray.getJSONObject(a).getString("content");
+
+                documents.add(d);
+
+            }
+
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        return documents;
+    }
+    AsyncHttpClient asyncHttpClient;
     Button up;
     String api = Init.api_key;
     String video = Init.url;
+    TextView responseView;
+    String responseString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Client1 client1 = new Client1();
-        client1.run();
+        responseView = (TextView) findViewById(R.id.textView);
+        asyncHttpClient = new AsyncHttpClient();
+        video += "?apikey="+api+"&text=genome";
+        asyncHttpClient.get(video, new AsyncHttpResponseHandler() {
+
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+
+                String byteStr = new String(responseBody);
+//                String id = getJobID(r);
+                responseView.setText(byteStr);
+            }
+
+            @Override
+            public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+
+            }
+        });
+        /*Client1 client1 = new Client1();
+        client1.run();*/
     }
-    class Client1 {
+    /*class Client1 {
         String api = Init.api_key;
         String video = Init.url;
         public void run() {
 
 
-            org.apache.http.client.HttpClient httpClient = new DefaultHttpClient();
+            org.apache. client = HttpClientBuilder.create().build();
             video += "?apikey="+api+"&text=genome";
             HttpGet httpGet = new HttpGet(video);
             CloseableHttpResponse response = null;
             try {
-                response = (CloseableHttpResponse) httpClient.execute(httpGet);
+                response = (CloseableHttpResponse) builder.execute(httpGet);
                 org.apache.http.StatusLine statusLine = response.getStatusLine();
                 Toast.makeText(MainActivity.this, "StatusLine: " + statusLine, Toast.LENGTH_SHORT).show();
                 HttpEntity entity = response.getEntity();
@@ -79,7 +141,7 @@ public class MainActivity extends ActionBarActivity {
 
             }
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
