@@ -42,9 +42,11 @@ public class MainActivity extends ActionBarActivity {
         Client1 client1 = new Client1();
         client1.run();
     }
-
     class Client1 {
+        String api = Init.api_key;
+        String video = Init.url;
         public void run() {
+
 
             org.apache.http.client.HttpClient httpClient = new DefaultHttpClient();
             video += "?apikey="+api+"&text=genome";
@@ -64,7 +66,7 @@ public class MainActivity extends ActionBarActivity {
 
                     }
                 }
-                }catch (ClientProtocolException cpe){
+            }catch (ClientProtocolException cpe){
                 cpe.printStackTrace();
             } catch (IOException ioe){
                 ioe.printStackTrace();
