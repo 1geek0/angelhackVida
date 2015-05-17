@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,21 +85,24 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         responseView = (TextView) findViewById(R.id.textView);
         asyncHttpClient = new AsyncHttpClient();
-        video += "?apikey="+api+"&text=genome";
-        asyncHttpClient.get(video, new AsyncHttpResponseHandler() {
+
+        video += "?apikey="+api+"&file=@/storage/external_SD/CAM00386.mp4";
+        asyncHttpClient.post(video, new AsyncHttpResponseHandler() {
 
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
 
                 String byteStr = new String(responseBody);
+
+                
 //                String id = getJobID(r);
                 responseView.setText(byteStr);
             }
 
             @Override
             public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
-
+                Toast.makeText(MainActivity.this, "FAILED", Toast.LENGTH_SHORT).show();
             }
         });
         /*Client1 client1 = new Client1();
